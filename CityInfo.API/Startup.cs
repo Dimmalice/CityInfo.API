@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
+using NLog.Extensions.Logging;
 
 namespace CityInfo.API
 {
@@ -15,7 +17,7 @@ namespace CityInfo.API
         
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
+            services.AddMvc() //.AddJsonFormatters().AddDataAnnotations()
                 .AddJsonOptions(o => {
                 if (o.SerializerSettings.ContractResolver != null)
                 {
@@ -24,11 +26,22 @@ namespace CityInfo.API
                         castedResolver.NamingStrategy = null;
                 }
             });
+
+          
         }
 
         
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+
+            loggerFactory.AddConsole();
+
+            loggerFactory.AddDebug();
+
+            //loggerFactory.AddProvider(new NLog.Extensions.Logging.NLogLoggerProvider());  h apo katw pio eukolo
+            loggerFactory.AddNLog();
+
             if (env.IsDevelopment()) 
             {
                 app.UseDeveloperExceptionPage(); //middleware
