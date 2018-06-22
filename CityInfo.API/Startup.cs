@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CityInfo.API.Entities;
+using CityInfo.API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
@@ -27,7 +30,11 @@ namespace CityInfo.API
                 }
             });
 
-          
+            var connectionString = @"Server=.;Database = CityInfoDB;Trusted_Connection = True;";
+            services.AddDbContext<CityInfoContext>(o => o.UseSqlServer(connectionString));
+
+            services.AddScoped<ICityInfoRepository, CityInfoRepository>();
+
         }
 
         
@@ -58,27 +65,8 @@ namespace CityInfo.API
                 routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
 
-
-
-
-
-
-            //app.Run((context) =>
-            //{
-            //    throw new Exception("example");
-            //});
-
-
-            //app.Run(async (context) =>
-            //{
-            //    if (context.Request.Path.ToString().Contains("mitsos"))
-            //    {
-            //        await context.Response.WriteAsync("Hello mitsos!");
-            //    }
-            //    else { 
-            //        await context.Response.WriteAsync("Hello World!");
-            //    }
-            //});
+            AutoMapper.Mapper.Initialize(cfg =>
+            cfg.CreateMap<Entities.City, Models.CityWithoutPointsOfInterestDto>());
         }
 
     }
